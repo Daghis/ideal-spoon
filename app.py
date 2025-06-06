@@ -44,9 +44,15 @@ def start_level(level: int):
 
 @app.route('/')
 def root():
-    # Always start with a clean session so previous progress doesn't
-    # incorrectly unlock levels for new players.
-    session.clear()
+    """Entry point for the game.
+
+    We used to wipe the session here to avoid leaking progress between
+    different users. However the session is stored client side so clearing it
+    would also erase a player's progress whenever they visit the root URL
+    again (for example after a server restart).  We now simply ensure the
+    session structure exists without discarding existing data so progress
+    persists across restarts.
+    """
     init_session()
     return redirect(url_for('levels'))
 
