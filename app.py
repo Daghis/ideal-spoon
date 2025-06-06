@@ -44,6 +44,9 @@ def start_level(level: int):
 
 @app.route('/')
 def root():
+    # Always start with a clean session so previous progress doesn't
+    # incorrectly unlock levels for new players.
+    session.clear()
     init_session()
     return redirect(url_for('levels'))
 
@@ -101,6 +104,8 @@ def index(level):
                     session.modified = True
         elif not valid:
             message = 'Wrong order!'
+            # Reset progress on incorrect number
+            start_level(level)
 
     next_level_enabled = len(session.get('clicked', [])) == total and level < max(LEVEL_NUMBERS)
 

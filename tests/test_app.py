@@ -94,10 +94,21 @@ def test_menu_resets_unsolved_level():
     with app.test_client() as client:
         client.get('/level/1')
         client.post('/level/1', data={'num': '1'})
-        # Go back to the level selection menu
         client.get('/levels')
-        # Re-enter the same level; progress should be cleared
         client.get('/level/1')
         with client.session_transaction() as sess:
             assert sess.get('clicked') == []
+
+def test_wrong_order_resets_level_2():
+    """Level 2 should reset when a wrong number is pressed."""
+    with app.test_client() as client:
+        client.get('/level/2')
+        client.post('/level/2', data={'num': '1'})
+        resp = client.post('/level/2', data={'num': '3'})
+        assert b'Wrong order!' in resp.data
+        with client.session_transaction() as sess:
+            assert sess.get('clicked') == []
+        resp = client.post('/level/2', data={'num': '1'})
+        with client.session_transaction() as sess:
+            assert sess.get('clicked') == [1]
 
