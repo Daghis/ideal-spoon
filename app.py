@@ -97,6 +97,8 @@ def index(level):
                     session.modified = True
         elif not valid:
             message = 'Wrong order!'
+            # Reset progress on incorrect number
+            start_level(level)
 
     next_level_enabled = len(session.get('clicked', [])) == total and level < max(LEVEL_NUMBERS)
 

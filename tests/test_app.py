@@ -88,3 +88,17 @@ def test_reverse_order_level_3():
             resp = client.post('/level/3', data={'num': str(n)})
         assert b'Level complete!' in resp.data
 
+
+def test_wrong_order_resets_level_2():
+    """Level 2 should reset when a wrong number is pressed."""
+    with app.test_client() as client:
+        client.get('/level/2')
+        client.post('/level/2', data={'num': '1'})
+        resp = client.post('/level/2', data={'num': '3'})
+        assert b'Wrong order!' in resp.data
+        with client.session_transaction() as sess:
+            assert sess.get('clicked') == []
+        resp = client.post('/level/2', data={'num': '1'})
+        with client.session_transaction() as sess:
+            assert sess.get('clicked') == [1]
+
