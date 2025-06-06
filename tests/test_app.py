@@ -113,3 +113,14 @@ def test_wrong_order_resets_level_2():
         with client.session_transaction() as sess:
             assert sess.get('clicked') == [1]
 
+
+def test_root_does_not_clear_progress():
+    """Visiting the root URL should not wipe existing session progress."""
+    with app.test_client() as client:
+        client.get('/level/0')
+        client.post('/level/0', data={'num': '1'})
+        # Visiting '/' used to clear the session. Ensure progress persists.
+        client.get('/')
+        with client.session_transaction() as sess:
+            assert 0 in sess.get('completed', [])
+
