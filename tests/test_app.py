@@ -88,3 +88,16 @@ def test_reverse_order_level_3():
             resp = client.post('/level/3', data={'num': str(n)})
         assert b'Level complete!' in resp.data
 
+
+def test_menu_resets_unsolved_level():
+    """Visiting the menu should reset progress for unsolved levels."""
+    with app.test_client() as client:
+        client.get('/level/1')
+        client.post('/level/1', data={'num': '1'})
+        # Go back to the level selection menu
+        client.get('/levels')
+        # Re-enter the same level; progress should be cleared
+        client.get('/level/1')
+        with client.session_transaction() as sess:
+            assert sess.get('clicked') == []
+

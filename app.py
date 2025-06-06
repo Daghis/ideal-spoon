@@ -51,6 +51,13 @@ def root():
 @app.route('/levels')
 def levels():
     init_session()
+    # Reset progress for an unsolved level when returning to the menu
+    current = session.get('level')
+    if current is not None and current not in session.get('completed', []):
+        session.pop('level', None)
+        session.pop('numbers', None)
+        session.pop('clicked', None)
+        session.modified = True
     min_level = min(LEVEL_NUMBERS)
     max_level = max(LEVEL_NUMBERS)
     completed = set(session.get('completed', []))
