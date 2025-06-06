@@ -34,5 +34,11 @@
     <div style="margin-top:20px;">
         <a href="{{ url_for('restart') }}">Restart</a>
     </div>
+    <script>
+        const msgEl = document.getElementById('message');
+        if (msgEl && msgEl.textContent.trim() !== '') {
+            setTimeout(() => { msgEl.textContent = ''; }, 1500);
+        }
+    </script>
 </body>
 </html>
