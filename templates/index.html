@@ -21,8 +21,8 @@
             <button name="num" value="{{ num }}" class="number" {% if num in clicked %}disabled{% endif %}>{{ num }}</button>
         </form>
         {% endfor %}
+        <div id="message">{{ message }}</div>
     </div>
-    <div id="message">{{ message }}</div>
     <div class="menu">
         <a href="{{ url_for('levels') }}">Menu</a>
         {% if next_level_enabled %}
@@ -39,12 +39,12 @@
         if (msgEl && msgEl.textContent.trim() !== '') {
             msgEl.style.display = 'block';
             requestAnimationFrame(() => {
-                msgEl.style.transform = 'translateX(-50%) translateY(0)';
+                msgEl.style.transform = 'translate(-50%, -50%) scale(1)';
             });
             setTimeout(() => {
                 msgEl.style.display = 'none';
                 msgEl.textContent = '';
-                msgEl.style.transform = 'translateX(-50%) translateY(20px)';
+                msgEl.style.transform = 'translate(-50%, -50%) scale(0.95)';
             }, 1500);
         }
     </script>
