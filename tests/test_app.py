@@ -24,6 +24,11 @@ def test_invalid_level_redirect():
 def test_level_completion_and_menu_unlocks():
     """Complete level 1 and verify next level unlocks in the menu."""
     with app.test_client() as client:
+        # Complete level 0 first
+        resp = client.get('/level/0')
+        assert resp.status_code == 200
+        resp = client.post('/level/0', data={'num': '1'})
+        assert b'Level complete!' in resp.data
         # Start level 1
         resp = client.get('/level/1')
         assert resp.status_code == 200
@@ -36,9 +41,10 @@ def test_level_completion_and_menu_unlocks():
         # Next level link should be enabled
         assert b'href="/level/2"' in resp.data
 
-        # Menu should show level 1 and 2 unlocked, 3 disabled
+        # Menu should show level 0,1 and 2 unlocked, 3 disabled
         resp = client.get('/levels')
         body = resp.get_data(as_text=True)
+        assert '<a href="/level/0">Level 0</a>' in body
         assert '<a href="/level/1">Level 1</a>' in body
         assert '<a href="/level/2">Level 2</a>' in body
         assert 'Level 3</li>' in body and 'href="/level/3"' not in body
@@ -55,4 +61,30 @@ def test_restart_clears_progress():
         # After restart, no numbers should be clicked
         with client.session_transaction() as sess:
             assert sess.get('clicked') == []
+
+
+def test_order_enforced_level_2():
+    """Level 2 requires numbers clicked in ascending order."""
+    with app.test_client() as client:
+        client.get('/level/2')
+        # Wrong first click
+        resp = client.post('/level/2', data={'num': '2'})
+        assert b'Wrong order!' in resp.data
+        # Correct sequence
+        for n in range(1, 10):
+            resp = client.post('/level/2', data={'num': str(n)})
+        assert b'Level complete!' in resp.data
+
+
+def test_reverse_order_level_3():
+    """Level 3 requires numbers clicked in descending order."""
+    with app.test_client() as client:
+        client.get('/level/3')
+        # Wrong first click
+        resp = client.post('/level/3', data={'num': '1'})
+        assert b'Wrong order!' in resp.data
+        # Correct sequence
+        for n in range(9, 0, -1):
+            resp = client.post('/level/3', data={'num': str(n)})
+        assert b'Level complete!' in resp.data
 
