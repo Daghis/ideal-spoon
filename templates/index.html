@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Press the Numbers</h1>
-    <div id="level-info">Level 1: Press all numbers 1 to 9 (any order)</div>
+    <div id="level-info">Level {{ level }}: Press all numbers 1 to {{ numbers|length }} (any order)</div>
     <div id="grid" class="grid">
         {% for num in numbers %}
         <form method="post" style="display:inline;">
@@ -17,8 +17,16 @@
         {% endfor %}
     </div>
     <div id="message">{{ message }}</div>
+    <div class="menu">
+        <a href="{{ url_for('levels') }}">Menu</a>
+        {% if next_level_enabled %}
+            <a href="{{ url_for('index', level=level + 1) }}">Next Level</a>
+        {% else %}
+            <span class="disabled">Next Level</span>
+        {% endif %}
+    </div>
     <div style="margin-top:20px;">
-        <a href="/restart">Restart</a>
+        <a href="{{ url_for('restart') }}">Restart</a>
     </div>
 </body>
 </html>
