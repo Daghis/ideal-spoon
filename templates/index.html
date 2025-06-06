@@ -37,7 +37,15 @@
     <script>
         const msgEl = document.getElementById('message');
         if (msgEl && msgEl.textContent.trim() !== '') {
-            setTimeout(() => { msgEl.textContent = ''; }, 1500);
+            msgEl.style.display = 'block';
+            requestAnimationFrame(() => {
+                msgEl.style.transform = 'translateX(-50%) translateY(0)';
+            });
+            setTimeout(() => {
+                msgEl.style.display = 'none';
+                msgEl.textContent = '';
+                msgEl.style.transform = 'translateX(-50%) translateY(20px)';
+            }, 1500);
         }
     </script>
 </body>
