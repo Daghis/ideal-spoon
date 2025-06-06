@@ -44,6 +44,9 @@ def start_level(level: int):
 
 @app.route('/')
 def root():
+    # Always start with a clean session so previous progress doesn't
+    # incorrectly unlock levels for new players.
+    session.clear()
     init_session()
     return redirect(url_for('levels'))
 
