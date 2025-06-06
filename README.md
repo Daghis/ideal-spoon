@@ -1,6 +1,6 @@
 # Number Button Game
 
-This is a simple web game where players press numbered buttons in order. It is implemented with Python using [Flask](https://flask.palletsprojects.com/).
+This is a simple web game where players press all numbered buttons. Order does not matter. It is implemented with Python using [Flask](https://flask.palletsprojects.com/).
 
 ## How to Run
 
