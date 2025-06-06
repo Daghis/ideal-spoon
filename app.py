@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import os
-import random
 
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key'
@@ -9,8 +8,8 @@ TOTAL_NUMBERS = 9
 
 
 def start_game():
-    session['numbers'] = random.sample(range(1, TOTAL_NUMBERS + 1), TOTAL_NUMBERS)
-    session['index'] = 1
+    """Initialize the game with numbers 1-9 in order."""
+    session['numbers'] = list(range(1, TOTAL_NUMBERS + 1))
     session['clicked'] = []
 
 
@@ -23,14 +22,10 @@ def index():
 
     if request.method == 'POST':
         num = int(request.form.get('num', 0))
-        expected = session.get('index', 1)
-        if num == expected:
+        if num not in session['clicked']:
             session['clicked'].append(num)
-            session['index'] = expected + 1
-            if expected == TOTAL_NUMBERS:
-                message = 'Level complete!'
-        else:
-            message = 'Wrong button. Try again!'
+        if len(session['clicked']) == TOTAL_NUMBERS:
+            message = 'Level complete!'
 
     return render_template(
         'index.html',
