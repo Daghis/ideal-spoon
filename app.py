@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import os
+import uuid
 
 # Configuration for how many numbers appear in each level.
 # New early levels introduce ordering rules.
@@ -24,13 +25,21 @@ LEVEL_ORDER = {
 
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key'
+# Unique identifier for this server instance. Stored in sessions so any
+# existing client data from a previous run can be detected and discarded.
+app.config['SERVER_ID'] = os.environ.get('SERVER_ID', str(uuid.uuid4()))
 
 
 def init_session():
-    """Ensure tracking info exists in the session."""
+    """Ensure tracking info exists and purge data from old server instances."""
+    # When the server restarts it generates a new SERVER_ID. If a client still
+    # holds a cookie from a previous run, discard that data to start fresh.
+    if session.get('server_id') != app.config['SERVER_ID']:
+        session.clear()
+        session['server_id'] = app.config['SERVER_ID']
     if 'completed' not in session:
         session['completed'] = []
-        session.modified = True
+    session.modified = True
 
 
 def start_level(level: int):
@@ -46,12 +55,10 @@ def start_level(level: int):
 def root():
     """Entry point for the game.
 
-    We used to wipe the session here to avoid leaking progress between
-    different users. However the session is stored client side so clearing it
-    would also erase a player's progress whenever they visit the root URL
-    again (for example after a server restart).  We now simply ensure the
-    session structure exists without discarding existing data so progress
-    persists across restarts.
+    The session data lives in a signed cookie. When the server restarts we
+    generate a new ``SERVER_ID`` which causes :func:`init_session` to clear any
+    old cookie data. Visiting the root URL therefore keeps progress during a
+    single server run but resets it after a restart.
     """
     init_session()
     return redirect(url_for('levels'))

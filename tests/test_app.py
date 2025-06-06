@@ -124,3 +124,22 @@ def test_root_does_not_clear_progress():
         with client.session_transaction() as sess:
             assert 0 in sess.get('completed', [])
 
+
+def test_session_cleared_after_server_restart():
+    """Progress should reset when the server restarts."""
+    with app.test_client() as client:
+        # Complete a level so progress exists
+        client.get('/level/0')
+        client.post('/level/0', data={'num': '1'})
+        with client.session_transaction() as sess:
+            assert 0 in sess.get('completed', [])
+
+        # Simulate a restart by changing the SERVER_ID
+        import uuid
+        app.config['SERVER_ID'] = str(uuid.uuid4())
+
+        # Visit the root which triggers init_session and should clear old data
+        client.get('/')
+        with client.session_transaction() as sess:
+            assert sess.get('completed') == []
+
