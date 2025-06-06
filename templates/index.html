@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Button Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Press the Numbers</h1>
+    <div id="level-info">Level 1: Press numbers 1 to 9 in order</div>
+    <div id="grid" class="grid">
+        {% for num in numbers %}
+        <form method="post" style="display:inline;">
+            <button name="num" value="{{ num }}" class="number" {% if num in clicked %}disabled{% endif %}>{{ num }}</button>
+        </form>
+        {% endfor %}
+    </div>
+    <div id="message">{{ message }}</div>
+    <div style="margin-top:20px;">
+        <a href="/restart">Restart</a>
+    </div>
+</body>
+</html>
