@@ -20,3 +20,13 @@ This is a simple web game where players press numbered buttons in order. It is i
 - `templates/index.html` – HTML template
 - `static/style.css` – basic styles
 - `requirements.txt` – Python dependencies
+
+## Testing
+
+Run the unit tests with coverage enabled:
+
+```bash
+pytest --cov=. --cov-fail-under=70 -q
+```
+
+The repository includes a GitHub Actions workflow that installs dependencies and runs these tests with coverage reporting automatically on every push and pull request.
