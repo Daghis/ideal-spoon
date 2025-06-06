@@ -2,7 +2,25 @@ from flask import Flask, render_template, request, session, redirect, url_for
 import os
 
 # Configuration for how many numbers appear in each level.
-LEVEL_NUMBERS = {1: 9, 2: 16, 3: 25}
+# New early levels introduce ordering rules.
+LEVEL_NUMBERS = {
+    0: 1,   # single button
+    1: 9,   # 3x3 grid, any order
+    2: 9,   # 3x3 grid, ascending order
+    3: 9,   # 3x3 grid, descending order
+    4: 16,  # 4x4 grid, any order
+    5: 25,  # 5x5 grid, any order
+}
+
+# Ordering rules for each level
+LEVEL_ORDER = {
+    0: 'asc',   # trivial
+    1: 'none',
+    2: 'asc',
+    3: 'desc',
+    4: 'none',
+    5: 'none',
+}
 
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key'
@@ -33,15 +51,16 @@ def root():
 @app.route('/levels')
 def levels():
     init_session()
+    min_level = min(LEVEL_NUMBERS)
     max_level = max(LEVEL_NUMBERS)
     completed = set(session.get('completed', []))
     first_unsolved = None
-    for lvl in range(1, max_level + 1):
+    for lvl in range(min_level, max_level + 1):
         if lvl not in completed:
             first_unsolved = lvl
             break
-    unlocked = completed.union({first_unsolved}) if first_unsolved else completed
-    return render_template('levels.html', levels=range(1, max_level + 1), unlocked=unlocked)
+    unlocked = completed.union({first_unsolved}) if first_unsolved is not None else completed
+    return render_template('levels.html', levels=range(min_level, max_level + 1), unlocked=unlocked)
 
 
 @app.route('/level/<int:level>', methods=['GET', 'POST'])
@@ -55,24 +74,38 @@ def index(level):
 
     message = ''
     total = LEVEL_NUMBERS[level]
+    order = LEVEL_ORDER.get(level, 'none')
 
     if request.method == 'POST':
         num = int(request.form.get('num', 0))
-        if num not in session['clicked']:
+        expected_len = len(session['clicked'])
+        valid = True
+        if order == 'asc' and num != expected_len + 1:
+            valid = False
+        if order == 'desc' and num != total - expected_len:
+            valid = False
+        if valid and num not in session['clicked']:
             session['clicked'].append(num)
             session.modified = True
-        if len(session['clicked']) == total:
-            message = 'Level complete!'
-            if level not in session['completed']:
-                session['completed'].append(level)
-                session.modified = True
+            if len(session['clicked']) == total:
+                message = 'Level complete!'
+                if level not in session['completed']:
+                    session['completed'].append(level)
+                    session.modified = True
+        elif not valid:
+            message = 'Wrong order!'
 
     next_level_enabled = len(session.get('clicked', [])) == total and level < max(LEVEL_NUMBERS)
+
+    import math
+    columns = math.ceil(math.sqrt(total))
     return render_template(
         'index.html',
         level=level,
         numbers=session['numbers'],
         clicked=session.get('clicked', []),
+        columns=columns,
+        order=order,
         message=message,
         next_level_enabled=next_level_enabled,
     )

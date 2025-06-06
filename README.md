@@ -1,6 +1,6 @@
 # Number Button Game
 
-This is a simple web game where players press all numbered buttons. Order does not matter. It is implemented with Python using [Flask](https://flask.palletsprojects.com/).
+This is a simple web game where players press all numbered buttons. Early levels introduce ordering rules. It is implemented with Python using [Flask](https://flask.palletsprojects.com/).
 
 ## How to Run
 
@@ -30,3 +30,11 @@ pytest --cov=. --cov-fail-under=70 -q
 ```
 
 The repository includes a GitHub Actions workflow that installs dependencies and runs these tests with coverage reporting automatically on every push and pull request.
+
+## Levels
+
+The game starts at level 0 with a single button "1". Level 1 presents a 3×3 grid
+and can be solved in any order. Level 2 uses the same grid but requires the
+buttons be pressed in ascending order. Level 3 keeps the grid while the numbers
+must be pressed in descending order. Later levels increase the total numbers and
+the grid automatically grows to stay roughly square.

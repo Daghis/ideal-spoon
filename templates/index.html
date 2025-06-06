@@ -8,8 +8,14 @@
 </head>
 <body>
     <h1>Press the Numbers</h1>
+    {% if order == 'asc' %}
+    <div id="level-info">Level {{ level }}: Press numbers 1 to {{ numbers|length }} in order</div>
+    {% elif order == 'desc' %}
+    <div id="level-info">Level {{ level }}: Press numbers {{ numbers|length }} down to 1 in reverse order</div>
+    {% else %}
     <div id="level-info">Level {{ level }}: Press all numbers 1 to {{ numbers|length }} (any order)</div>
-    <div id="grid" class="grid">
+    {% endif %}
+    <div id="grid" class="grid" style="grid-template-columns: repeat({{ columns }}, 80px);">
         {% for num in numbers %}
         <form method="post" style="display:inline;">
             <button name="num" value="{{ num }}" class="number" {% if num in clicked %}disabled{% endif %}>{{ num }}</button>
