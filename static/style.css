@@ -24,3 +24,24 @@ button.number {
     font-size: 18px;
     color: #333;
 }
+
+.menu {
+    margin-top: 20px;
+}
+
+.menu a, .menu span {
+    margin: 0 10px;
+}
+
+.levels-list {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.disabled {
+    color: #999;
+    pointer-events: none;
+    text-decoration: none;
+}
