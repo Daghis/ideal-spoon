@@ -99,6 +99,7 @@ def test_menu_resets_unsolved_level():
         with client.session_transaction() as sess:
             assert sess.get('clicked') == []
 
+
 def test_wrong_order_resets_level_2():
     """Level 2 should reset when a wrong number is pressed."""
     with app.test_client() as client:
